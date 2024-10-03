@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GPT</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to bottom, #000000, #000000);
+      color: white;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    .boxContainer {
+      display: flex;
+      justify-content: space-between;
+      height: 64px;
+      --boxSize: 8px;
+      --gutter: 4px;
+      width: calc((var(--boxSize) + var(--gutter)) * 5);
+      margin-bottom: 20px;
+    }
+
+    .box {
+      transform: scaleY(.4);
+      height: 100%;
+      width: var(--boxSize);
+      background: #12E2DC;
+      animation-duration: 1.2s;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      border-radius: 8px;
+    }
+
+    .box1 { animation-name: quiet; }
+    .box2 { animation-name: normal; }
+    .box3 { animation-name: quiet; }
+    .box4 { animation-name: loud; }
+    .box5 { animation-name: quiet; }
+
+    @keyframes quiet {
+      25% { transform: scaleY(.6); }
+      50% { transform: scaleY(.4); }
+      75% { transform: scaleY(.8); }
+    }
+
+    @keyframes normal {
+      25% { transform: scaleY(1); }
+      50% { transform: scaleY(.4); }
+      75% { transform: scaleY(.6); }
+    }
+
+    @keyframes loud {
+      25% { transform: scaleY(1); }
+      50% { transform: scaleY(.4); }
+      75% { transform: scaleY(1.2); }
+    }
+
+    h2 {
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="boxContainer">
+      <div class="box box1"></div>
+      <div class="box box2"></div>
+      <div class="box box3"></div>
+      <div class="box box4"></div>
+      <div class="box box5"></div>
+    </div>
+    <p id="listening-text">Listening...</p>
+
+    <h2>Generated Response:</h2>
+    <p id="response-text">{{ response }}</p>
+
+    {% if audio %}
+      <audio id="audioPlayer" controls autoplay>
+        <source src="data:audio/mp3;base64,{{ audio }}" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+    {% endif %}
+  </div>
+  <form id="speechForm" action="/gpt" method="POST">
+    <input type="hidden" id="transcribed-text" name="transcribed_text">
+  </form>
+
+  <script>
+    function startSpeechRecognition() {
+      if ('webkitSpeechRecognition' in window) {
+        var recognition = new webkitSpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = function(event) {
+          var transcript = event.results[0][0].transcript;
+          document.getElementById('transcribed-text').value = transcript;
+          document.getElementById('speechForm').submit();
+        };
+
+        recognition.start();
+      } else {
+        alert('Speech recognition not supported in this browser.');
+      }
+    }
+
+    // Play the audio and restart speech recognition when finished
+    var audioPlayer = document.getElementById('audioPlayer');
+    if (audioPlayer) {
+      audioPlayer.addEventListener('ended', function() {
+        startSpeechRecognition();
+      });
+    } else {
+      startSpeechRecognition();
+    }
+  </script>
+</body>
+</html>
