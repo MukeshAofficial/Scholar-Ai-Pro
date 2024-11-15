@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
-genai.configure(api_key="AIzaSyAbmCYsZsjfCPf-uakFksDglYasW4EsehE")
+genai.configure(api_key="AIzaSyDqYe2MmvwxHZR8WBeefRx1eagXF-dydyA")
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.route('/')
